@@ -13,6 +13,7 @@ int main(int argc, char **argv) {
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
   
+  // commnicates with os to make a socket
   int server_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (server_fd < 0) {
    std::cerr << "Failed to create server socket\n";
@@ -52,10 +53,10 @@ int main(int argc, char **argv) {
 
   // Uncomment the code below to pass the first stage
   // 
-  // accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
-  // std::cout << "Client connected\n";
-  // 
-  // close(server_fd);
+  accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
+  std::cout << "Client connected\n";
+  
+  close(server_fd);
 
   return 0;
 }
