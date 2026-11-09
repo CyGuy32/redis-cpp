@@ -14,6 +14,7 @@ int main(int argc, char **argv) {
   std::cerr << std::unitbuf;
   
   // commnicates with os to make a socket
+  // integer for the os to find/know its address
   int server_fd = socket(AF_INET, SOCK_STREAM, 0);
   if (server_fd < 0) {
    std::cerr << "Failed to create server socket\n";
@@ -31,13 +32,15 @@ int main(int argc, char **argv) {
   struct sockaddr_in server_addr;
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = INADDR_ANY;
-  server_addr.sin_port = htons(6379);
+  server_addr.sin_port = htons(6380);
   
+  // binds the ip address and port to the socket --> has to be 0
   if (bind(server_fd, (struct sockaddr *) &server_addr, sizeof(server_addr)) != 0) {
-    std::cerr << "Failed to bind to port 6379\n";
+    std::cerr << "Failed to bind to port 6380\n";
     return 1;
   }
   
+  // listen makes socket ready for incoming connections
   int connection_backlog = 5;
   if (listen(server_fd, connection_backlog) != 0) {
     std::cerr << "listen failed\n";
@@ -53,8 +56,22 @@ int main(int argc, char **argv) {
 
   // Uncomment the code below to pass the first stage
   // 
-  accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
-  std::cout << "Client connected\n";
+
+  // receive information about it
+  int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
+
+  if (client_fd < 0) {
+    std::cout << "Client connection failed\n";
+  }
+  else {
+    std::cout << "Client connected\n";
+    std::string temp = "+PONG\r\n";
+    send(client_fd, temp.c_str(), temp.length(), 0);
+  }
+  
+
+  // // bytes received
+  // ssize_t bytes_received = recv(client_fd, )
   
   close(server_fd);
 
