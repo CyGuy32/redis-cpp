@@ -1,33 +1,47 @@
-[![progress-banner](https://backend.codecrafters.io/progress/redis/2f43b177-613f-484a-944f-527c27bc2c10)](https://app.codecrafters.io/users/CyGuy32?r=2qF)
+# Redis Server in C++
 
-This is a starting point for C++ solutions to the
-["Build Your Own Redis" Challenge](https://codecrafters.io/challenges/redis).
+A Redis server implementation in progress, built to learn C++, socket programming,
+and debugging. I'm using this project to understand how clients connect to a
+server, how bytes move over TCP, and how Redis represents commands and responses.
 
-In this challenge, you'll build a toy Redis clone that's capable of handling
-basic commands like `PING`, `SET` and `GET`. Along the way we'll learn about
-event loops, the Redis protocol and more.
+## Current progress
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+- Creates an IPv4 TCP listening socket on port `6379`.
+- Accepts one client connection.
+- Sends the hardcoded RESP response `+PONG\r\n`, then exits.
 
-# Passing the first stage
+The server currently sends its response immediately after connecting. Command
+reading and parsing, repeated requests, and key-value storage are not implemented
+yet.
 
-The entry point for your Redis implementation is in `src/main.cpp`. Study and
-uncomment the relevant code, then run the command below to execute the tests on
-our servers:
+## Build and run locally
+
+On macOS, with a C++23-capable `clang++` compiler:
 
 ```sh
-codecrafters submit
+clang++ -std=c++23 src/main.cpp -o /tmp/redis-learning
+/tmp/redis-learning
 ```
 
-That's all!
+In another terminal on the same computer:
 
-# Stage 2 & beyond
+```sh
+nc -v 127.0.0.1 6379
+```
 
-Note: This section is for stages 2 and beyond.
+The client should display `+PONG`. Restart the server for each connection.
+Ensure another Redis instance is not already using port `6379`.
 
-1. Ensure you have `cmake` installed locally
-1. Run `./your_program.sh` to run your Redis server, which is implemented in
-   `src/main.cpp`.
-1. Run `codecrafters submit` to submit your solution to CodeCrafters. Test
-   output will be streamed to your terminal.
+## Debugging notes
+
+During local testing, an existing Redis instance was listening on
+`127.0.0.1:6379`, while this server was bound to the wildcard address on the same
+port. The client reached the existing instance instead of this program.
+Inspecting listeners with `lsof` and testing on a different port helped identify
+the conflict.
+
+## Acknowledgment
+
+Started from the C++ starter repository for the
+[CodeCrafters Build Your Own Redis challenge](https://codecrafters.io/challenges/redis).
+I'm working through the implementation incrementally and documenting what I learn.
