@@ -32,11 +32,11 @@ int main(int argc, char **argv) {
   struct sockaddr_in server_addr;
   server_addr.sin_family = AF_INET;
   server_addr.sin_addr.s_addr = INADDR_ANY;
-  server_addr.sin_port = htons(6379);
+  server_addr.sin_port = htons(6380);
   
   // binds the ip address and port to the socket --> has to be 0
   if (bind(server_fd, (struct sockaddr *) &server_addr, sizeof(server_addr)) != 0) {
-    std::cerr << "Failed to bind to port 6379\n";
+    std::cerr << "Failed to bind to port 6380\n";
     return 1;
   }
   
@@ -64,11 +64,17 @@ int main(int argc, char **argv) {
     std::cout << "Client connection failed\n";
   }
   else {
+    char buffer[1024];
+    int bytesReceived = recv(client_fd, buffer, sizeof(buffer), 0);
     std::cout << "Client connected\n";
-    std::string temp = "+PONG\r\n";
-    send(client_fd, temp.c_str(), temp.length(), 0);
+
+    while (bytesReceived > 0){
+      std::string temp = "+PONG\r\n";
+      send(client_fd, temp.c_str(), temp.length(), 0);
+      bytesReceived = recv(client_fd, buffer, sizeof(buffer), 0);
+    }
+    close(client_fd);
   }
-  
 
   // // bytes received
   // ssize_t bytes_received = recv(client_fd, )
