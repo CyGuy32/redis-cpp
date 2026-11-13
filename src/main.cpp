@@ -8,13 +8,14 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include "handleclient.hpp"
+
 int main(int argc, char **argv) {
   // Flush after every std::cout / std::cerr
   std::cout << std::unitbuf;
   std::cerr << std::unitbuf;
 
   // constants
-  const std::string PONG_RESPONSE = "+PONG\r\n";
   const int PORT = 6379;
   
   // commnicates with os to make a socket
@@ -68,14 +69,7 @@ int main(int argc, char **argv) {
     std::cout << "Client connection failed\n";
   }
   else {
-    char buffer[1024];
-    int bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-    std::cout << "Client connected\n";
-
-    while (bytes_received > 0) {
-      send(client_fd, PONG_RESPONSE.c_str(), PONG_RESPONSE.length(), 0);
-      bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
-    }
+    handleclient(client_fd);
     close(client_fd);
   }
 
