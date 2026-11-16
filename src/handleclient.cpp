@@ -1,5 +1,7 @@
 #include <iostream>
 #include <sys/socket.h>
+#include <unistd.h>
+
 
 #include "handleclient.hpp"
 
@@ -16,4 +18,6 @@ void handleclient(int client_fd) {
       send(client_fd, PONG_RESPONSE.c_str(), PONG_RESPONSE.length(), 0);
       bytes_received = recv(client_fd, buffer, sizeof(buffer), 0);
     }
+
+    close(client_fd);
 }

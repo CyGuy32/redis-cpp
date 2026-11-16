@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <thread>
 
 #include "handleclient.hpp"
 
@@ -59,24 +60,19 @@ int main(int argc, char **argv) {
   // You can use print statements as follows for debugging, they'll be visible when running tests.
   std::cout << "Logs from your program will appear here!\n";
 
-  // Uncomment the code below to pass the first stage
-  // 
+  while (true) {
+    int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
 
-  // receive information about it
-  int client_fd = accept(server_fd, (struct sockaddr *) &client_addr, (socklen_t *) &client_addr_len);
-
-  if (client_fd < 0) {
-    std::cout << "Client connection failed\n";
+    if (client_fd < 0) {
+      std::cout << "Client connection failed for client " << client_fd << "\n";
+    }
+    else {
+      std::thread worker(handleclient, client_fd);
+      worker.detach();
+    }
   }
-  else {
-    handleclient(client_fd);
-    close(client_fd);
-  }
-
-  // // bytes received
-  // ssize_t bytes_received = recv(client_fd, )
   
-  close(server_fd);
+  // close(server_fd);
 
   return 0;
 }
